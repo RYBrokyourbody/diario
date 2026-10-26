@@ -1,0 +1,341 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Diario RokYourBody</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Figtree:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: colonna unica stile app, striscia dei giorni in alto, card del giorno, revisione della domenica */
+:root {
+  --bg: #f3f7f4; --surface: #ffffff; --ink: #17231c; --muted: #5d6e64;
+  --line: #d7e3db; --accent: #2e9e5b; --accent-ink: #ffffff; --accent-soft: #e2f3e8;
+  --warm: #f2a93b;
+  --display: "Bricolage Grotesque", "Figtree", system-ui, sans-serif;
+  --body: "Figtree", system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #0f1612; --surface: #18221c; --ink: #e8f1eb; --muted: #9aaea2;
+  --line: #2a3a31; --accent: #45c27a; --accent-ink: #0b1a11; --accent-soft: #1d3326; --warm: #f2b45a; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #0f1612; --surface: #18221c; --ink: #e8f1eb; --muted: #9aaea2;
+  --line: #2a3a31; --accent: #45c27a; --accent-ink: #0b1a11; --accent-soft: #1d3326; --warm: #f2b45a; color-scheme: dark }
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+body { background: var(--bg); color: var(--ink); font-family: var(--body); font-size: 16px; line-height: 1.45; }
+.wrap { max-width: 520px; margin: 0 auto; padding-block: 18px 48px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); display: flex; flex-direction: column; gap: 16px; }
+header { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+.brand { font-family: var(--display); font-weight: 800; font-size: 20px; color: var(--accent); letter-spacing: .2px; }
+.hello { font-size: 14px; color: var(--muted); }
+.iconbtn { border: 1px solid var(--line); background: var(--surface); color: var(--ink); border-radius: 12px; padding: 8px 12px; font: 600 14px var(--body); cursor: pointer; }
+h1 { font-family: var(--display); font-weight: 800; font-size: 28px; line-height: 1.1; margin: 0; text-wrap: balance; }
+h2 { font-family: var(--display); font-weight: 600; font-size: 19px; margin: 0; }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 18px; padding: 16px; display: flex; flex-direction: column; gap: 14px; }
+.weeknav { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.weeknav button { width: 40px; height: 40px; border-radius: 12px; border: 1px solid var(--line); background: var(--surface); color: var(--ink); font-size: 18px; cursor: pointer; }
+.weeknav .lbl { text-align: center; font-weight: 600; }
+.weeknav .lbl small { display: block; color: var(--muted); font-weight: 500; font-size: 13px; }
+.days { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; }
+.day { border: 1px solid var(--line); background: var(--surface); color: var(--ink); border-radius: 14px; padding: 8px 0 7px; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 4px; font: 600 12px var(--body); }
+.day .n { font-size: 17px; font-variant-numeric: tabular-nums; }
+.day .bar { width: 60%; height: 4px; border-radius: 2px; background: var(--line); overflow: hidden; }
+.day .bar i { display: block; height: 100%; background: var(--accent); }
+.day.sel { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+.day.sel .bar { background: color-mix(in srgb, var(--accent-ink) 30%, transparent); }
+.day.sel .bar i { background: var(--accent-ink); }
+.day.today:not(.sel) { border-color: var(--accent); }
+.day.future { opacity: .45; }
+.habit { display: flex; align-items: center; gap: 12px; padding: 4px 0; }
+.habit .ico { font-size: 22px; width: 40px; height: 40px; border-radius: 12px; background: var(--accent-soft); display: grid; place-items: center; flex: none; }
+.habit .txt { flex: 1; min-width: 0; }
+.habit .txt b { display: block; font-weight: 700; }
+.habit .txt small { color: var(--muted); font-size: 13px; display: block; }
+.tog { width: 48px; height: 48px; border-radius: 14px; border: 2px solid var(--accent); background: transparent; color: var(--accent-ink); font-size: 22px; cursor: pointer; flex: none; display: grid; place-items: center; }
+.tog[aria-pressed="true"] { background: var(--accent); }
+.tog[aria-pressed="true"]::after { content: "✓"; font-weight: 800; }
+.bottles { display: flex; gap: 6px; flex: none; }
+.bottle { width: 34px; height: 48px; border-radius: 10px 10px 12px 12px; border: 2px solid var(--accent); background: transparent; cursor: pointer; position: relative; overflow: hidden; padding: 0; }
+.bottle[aria-pressed="true"] { background: var(--accent); }
+.bottle span { position: absolute; inset: auto 0 4px; font: 700 11px var(--body); color: var(--accent); }
+.bottle[aria-pressed="true"] span { color: var(--accent-ink); }
+.moods { display: flex; gap: 6px; }
+.mood { flex: 1; height: 46px; border-radius: 12px; border: 1px solid var(--line); background: var(--surface); font-size: 22px; cursor: pointer; }
+.mood[aria-pressed="true"] { border: 2px solid var(--accent); background: var(--accent-soft); }
+label.f { display: flex; flex-direction: column; gap: 6px; font-weight: 600; font-size: 14px; }
+textarea, input[type=text], input[type=number] { width: 100%; border: 1px solid var(--line); border-radius: 12px; padding: 10px 12px; font: 16px var(--body); background: var(--bg); color: var(--ink); resize: vertical; }
+textarea { min-height: 64px; }
+.saved { font-size: 13px; color: var(--muted); text-align: center; min-height: 18px; }
+.primary { width: 100%; border: 0; border-radius: 14px; padding: 15px; background: var(--accent); color: var(--accent-ink); font: 700 16px var(--body); cursor: pointer; }
+.ghost { width: 100%; border: 1px solid var(--line); border-radius: 14px; padding: 13px; background: var(--surface); color: var(--ink); font: 600 15px var(--body); cursor: pointer; }
+.stats { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 8px; }
+.stat { background: var(--bg); border-radius: 12px; padding: 10px 12px; }
+.stat b { font-family: var(--display); font-size: 20px; font-variant-numeric: tabular-nums; }
+.stat small { display: block; color: var(--muted); font-size: 13px; }
+.hint { font-size: 14px; color: var(--muted); margin: 0; }
+details.card summary { cursor: pointer; font-family: var(--display); font-weight: 600; font-size: 19px; list-style: none; display: flex; justify-content: space-between; }
+details.card summary::after { content: "+"; color: var(--accent); font-size: 22px; line-height: 1; }
+details[open].card summary::after { content: "−"; }
+.tip { display: flex; flex-direction: column; gap: 4px; }
+.tip b { font-weight: 700; }
+.tip p { margin: 0; font-size: 15px; }
+.quote { font-style: italic; color: var(--accent); text-align: center; font-size: 15px; margin: 0; padding: 0 8px; }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip { border: 1px solid var(--line); background: var(--surface); color: var(--ink); border-radius: 999px; padding: 9px 14px; font: 600 14px var(--body); cursor: pointer; }
+.chip[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+.copybox { font: 14px/1.4 var(--body); min-height: 180px; }
+.toast { position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(18px + env(safe-area-inset-bottom, 0px)); background: var(--ink); color: var(--bg); padding: 10px 16px; border-radius: 12px; font-weight: 600; font-size: 14px; }
+button:focus-visible, textarea:focus-visible, input:focus-visible, summary:focus-visible { outline: 3px solid var(--warm); outline-offset: 2px; }
+@media (prefers-reduced-motion: no-preference) { .tog, .bottle, .day, .mood, .chip { transition: background .15s, border-color .15s; } }
+</style>
+
+<div class="wrap">
+  <header>
+    <div>
+      <div class="brand">RokYourBody</div>
+      <div class="hello" id="hello">Il tuo diario di ogni giorno</div>
+    </div>
+    <button class="iconbtn" id="openSettings" type="button">⚙️ Impostazioni</button>
+  </header>
+
+  <section class="card" id="settings" hidden>
+    <h2>Le tue impostazioni</h2>
+    <label class="f" for="nameIn">Il tuo nome
+      <input type="text" id="nameIn" placeholder="Come ti chiama il coach" autocomplete="given-name">
+    </label>
+    <label class="f" for="goalIn">Il tuo obiettivo del mese
+      <input type="text" id="goalIn" placeholder="Per esempio acqua e movimento">
+    </label>
+    <div class="f">Cosa vuoi segnare ogni giorno
+      <div class="chips" id="habitChips"></div>
+    </div>
+    <label class="f" for="litersIn">Bottiglie da 1 litro al giorno
+      <input type="number" id="litersIn" min="1" max="5" inputmode="numeric">
+    </label>
+    <button class="primary" id="closeSettings" type="button">Fatto</button>
+  </section>
+
+  <section class="card">
+    <div class="weeknav">
+      <button type="button" id="prevW" aria-label="Settimana precedente">‹</button>
+      <div class="lbl" id="weekLbl"></div>
+      <button type="button" id="nextW" aria-label="Settimana successiva">›</button>
+    </div>
+    <div class="days" id="days"></div>
+  </section>
+
+  <section class="card" id="dayCard">
+    <div>
+      <h1 id="dayTitle"></h1>
+      <p class="hint" id="goalLine"></p>
+    </div>
+    <div id="habits"></div>
+    <div class="f">Come mi sento oggi
+      <div class="moods" id="moods"></div>
+    </div>
+    <label class="f" for="noteIn">Una nota sulla giornata (facoltativa)
+      <textarea id="noteIn" placeholder="Per esempio cena fuori, giornata pesante al lavoro"></textarea>
+    </label>
+    <div class="saved" id="saved"></div>
+  </section>
+
+  <section class="card">
+    <h2>📝 La domenica, due righe per il coach</h2>
+    <div class="stats" id="stats"></div>
+    <label class="f" for="r1">Cosa è andato bene questa settimana
+      <textarea id="r1"></textarea>
+    </label>
+    <label class="f" for="r2">Cosa è stato più difficile
+      <textarea id="r2"></textarea>
+    </label>
+    <label class="f" for="r3">Il piccolo passo che voglio fare la prossima settimana
+      <textarea id="r3"></textarea>
+    </label>
+    <button class="primary" id="copyBtn" type="button">📲 Copia il riepilogo per WhatsApp</button>
+    <p class="hint">Poi apri la chat con il tuo coach e incolla il messaggio.</p>
+    <textarea class="copybox" id="copyBox" readonly hidden aria-label="Riepilogo da copiare"></textarea>
+  </section>
+
+  <details class="card">
+    <summary>💡 I consigli del coach</summary>
+    <div class="tip"><b>🎯 Un obiettivo alla volta</b><p>Scegli una o due abitudini che oggi senti davvero sostenibili e metti tutta l'attenzione lì. Il resto lo costruiamo poco alla volta.</p></div>
+    <div class="tip"><b>💧 Acqua</b><p>La prima bottiglia finiscila entro pranzo, la seconda entro metà pomeriggio. Preparale la sera e lasciale vicino alle chiavi, così uscendo le porti con te. Se resti indietro, un bicchiere pieno prima di ogni pasto ti aiuta a recuperare.</p></div>
+    <div class="tip"><b>🚶 Movimento</b><p>Una camminata di 20 minuti sempre nello stesso momento della giornata. Se passi tante ore seduta, alzati almeno una volta ogni ora per pochi squat o qualche passo. Conta più la costanza della durata.</p></div>
+    <div class="tip"><b>🥚 Proteine</b><p>Non devono mai mancare, nemmeno a colazione e negli spuntini. Privilegia pesce, carni bianche, albume, latticini magri e yogurt greco.</p></div>
+    <div class="tip"><b>🍫 Quando arriva una voglia</b><p>Prenditi qualche minuto con un bicchiere d'acqua o una tisana calda, spesso è la testa a chiedere una pausa più dello stomaco. Se resta, scegli con calma qualcosa di buono, come uno yogurt greco con cacao amaro, un frutto o un paio di quadratini di fondente.</p></div>
+  </details>
+
+  <p class="quote">Una settimana storta non cancella il lavoro fatto. Sono i giorni buoni, uno dopo l'altro, a fare la differenza nel tempo. 💚</p>
+</div>
+
+<script>
+const HABITS = [
+  { id: "acqua", ico: "💧", name: "Acqua", sub: "tocca una bottiglia quando la finisci" },
+  { id: "movimento", ico: "🚶", name: "Movimento", sub: "camminata di 20 minuti o pause attive" },
+  { id: "allenamento", ico: "🏋️", name: "Allenamento", sub: "seduta del programma fatta" },
+  { id: "pasti", ico: "🍽️", name: "Pasti", sub: "secondo il piano alimentare" },
+  { id: "proteina", ico: "🥚", name: "Proteina", sub: "in ogni pasto, colazione compresa" },
+  { id: "voglie", ico: "🍫", name: "Voglie gestite", sub: "acqua o tisana, poi una coccola scelta" },
+  { id: "integratore", ico: "💊", name: "Integratore", sub: "preso come previsto dal piano" },
+];
+const MOODS = ["😩", "😕", "😐", "🙂", "😄"];
+const GG = ["Lun", "Mar", "Mer", "Gio", "Ven", "Sab", "Dom"];
+const GIORNI = ["domenica", "lunedì", "martedì", "mercoledì", "giovedì", "venerdì", "sabato"];
+const MESI = ["gennaio","febbraio","marzo","aprile","maggio","giugno","luglio","agosto","settembre","ottobre","novembre","dicembre"];
+const KEY = "ryb-diario-v1";
+
+let S = { profile: { name: "", goal: "", liters: 2, habits: ["acqua", "movimento", "pasti", "proteina", "voglie"] }, days: {}, reviews: {} };
+let memOnly = false;
+try { const raw = localStorage.getItem(KEY); if (raw) { const p = JSON.parse(raw); S = { ...S, ...p, profile: { ...S.profile, ...(p.profile || {}) } }; } } catch (e) { memOnly = true; }
+
+const $ = id => document.getElementById(id);
+const iso = d => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
+const mondayOf = d => { const x = new Date(d.getFullYear(), d.getMonth(), d.getDate()); const w = (x.getDay() + 6) % 7; x.setDate(x.getDate() - w); return x; };
+const addDays = (d, n) => { const x = new Date(d); x.setDate(x.getDate() + n); return x; };
+const today = new Date(); const todayIso = iso(today);
+let weekStart = mondayOf(today);
+let sel = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+
+let saveTimer;
+function save() {
+  try { localStorage.setItem(KEY, JSON.stringify(S)); $("saved").textContent = "Salvato sul tuo telefono ✓"; }
+  catch (e) { $("saved").textContent = "Questo browser non salva i dati, usa il riepilogo per non perderli"; }
+  clearTimeout(saveTimer); saveTimer = setTimeout(() => $("saved").textContent = "", 1800);
+}
+const dayData = k => (S.days[k] ||= {});
+function score(k) {
+  const d = S.days[k]; if (!d) return 0;
+  const hs = S.profile.habits; if (!hs.length) return 0;
+  let tot = 0;
+  hs.forEach(h => { if (h === "acqua") tot += Math.min(1, (d.acqua || 0) / S.profile.liters); else if (d[h]) tot += 1; });
+  return tot / hs.length;
+}
+const fmtShort = d => `${d.getDate()}/${d.getMonth()+1}`;
+
+function renderWeek() {
+  const end = addDays(weekStart, 6);
+  const isThis = iso(weekStart) === iso(mondayOf(today));
+  $("weekLbl").innerHTML = `Dal ${weekStart.getDate()} ${weekStart.getMonth() !== end.getMonth() ? MESI[weekStart.getMonth()] + " " : ""}al ${end.getDate()} ${MESI[end.getMonth()]}<small>${isThis ? "Questa settimana" : "Settimana passata"}</small>`;
+  $("nextW").disabled = isThis; $("nextW").style.visibility = isThis ? "hidden" : "visible";
+  const box = $("days"); box.innerHTML = "";
+  for (let i = 0; i < 7; i++) {
+    const d = addDays(weekStart, i), k = iso(d);
+    const b = document.createElement("button"); b.type = "button";
+    b.className = "day" + (k === iso(sel) ? " sel" : "") + (k === todayIso ? " today" : "") + (k > todayIso ? " future" : "");
+    b.disabled = k > todayIso;
+    b.innerHTML = `<span>${GG[i]}</span><span class="n">${d.getDate()}</span><span class="bar"><i style="width:${Math.round(score(k)*100)}%"></i></span>`;
+    b.setAttribute("aria-label", `${GIORNI[d.getDay()]} ${d.getDate()}`);
+    b.onclick = () => { sel = d; renderAll(); };
+    box.appendChild(b);
+  }
+}
+
+function renderDay() {
+  const k = iso(sel), d = dayData(k);
+  $("dayTitle").textContent = k === todayIso ? "Oggi" : `${GIORNI[sel.getDay()][0].toUpperCase() + GIORNI[sel.getDay()].slice(1)} ${sel.getDate()} ${MESI[sel.getMonth()]}`;
+  $("goalLine").textContent = S.profile.goal ? `🎯 Obiettivo del mese, ${S.profile.goal}` : "Spunta quello che hai fatto. Ci vuole meno di un minuto.";
+  const wrap = $("habits"); wrap.innerHTML = "";
+  HABITS.filter(h => S.profile.habits.includes(h.id)).forEach(h => {
+    const row = document.createElement("div"); row.className = "habit";
+    row.innerHTML = `<div class="ico" aria-hidden="true">${h.ico}</div><div class="txt"><b>${h.name}</b><small>${h.id === "acqua" ? `${d.acqua || 0} di ${S.profile.liters} litri` : h.sub}</small></div>`;
+    if (h.id === "acqua") {
+      const bs = document.createElement("div"); bs.className = "bottles";
+      for (let i = 1; i <= S.profile.liters; i++) {
+        const b = document.createElement("button"); b.type = "button"; b.className = "bottle";
+        b.setAttribute("aria-pressed", (d.acqua || 0) >= i); b.setAttribute("aria-label", `Bottiglia ${i}`);
+        b.innerHTML = `<span>${i}L</span>`;
+        b.onclick = () => { d.acqua = (d.acqua || 0) >= i ? i - 1 : i; save(); renderAll(); };
+        bs.appendChild(b);
+      }
+      row.appendChild(bs);
+    } else {
+      const b = document.createElement("button"); b.type = "button"; b.className = "tog";
+      b.setAttribute("aria-pressed", !!d[h.id]); b.setAttribute("aria-label", h.name);
+      b.onclick = () => { d[h.id] = !d[h.id]; save(); renderAll(); };
+      row.appendChild(b);
+    }
+    wrap.appendChild(row);
+  });
+  const m = $("moods"); m.innerHTML = "";
+  MOODS.forEach((e, i) => {
+    const b = document.createElement("button"); b.type = "button"; b.className = "mood"; b.textContent = e;
+    b.setAttribute("aria-pressed", d.mood === i + 1); b.setAttribute("aria-label", `Umore ${i+1} su 5`);
+    b.onclick = () => { d.mood = d.mood === i + 1 ? undefined : i + 1; save(); renderAll(); };
+    m.appendChild(b);
+  });
+  $("noteIn").value = d.note || "";
+}
+
+function weekStats() {
+  const keys = [...Array(7)].map((_, i) => iso(addDays(weekStart, i)));
+  const out = [];
+  S.profile.habits.forEach(hid => {
+    const h = HABITS.find(x => x.id === hid);
+    if (hid === "acqua") { const l = keys.reduce((a, k) => a + ((S.days[k] || {}).acqua || 0), 0); out.push({ h, v: `${l}/${S.profile.liters * 7}`, u: "litri" }); }
+    else { const n = keys.filter(k => (S.days[k] || {})[hid]).length; out.push({ h, v: `${n}/7`, u: "giorni" }); }
+  });
+  const moods = keys.map(k => (S.days[k] || {}).mood).filter(Boolean);
+  const avg = moods.length ? (moods.reduce((a, b) => a + b, 0) / moods.length).toFixed(1).replace(".", ",") : null;
+  return { keys, out, avg };
+}
+
+function renderReview() {
+  const { out, avg } = weekStats();
+  $("stats").innerHTML = out.map(s => `<div class="stat"><b>${s.v}</b><small>${s.h.ico} ${s.h.name}, ${s.u}</small></div>`).join("") +
+    `<div class="stat"><b>${avg ?? "…"}</b><small>🙂 Umore medio su 5</small></div>`;
+  const r = S.reviews[iso(weekStart)] || {};
+  $("r1").value = r.bene || ""; $("r2").value = r.difficile || ""; $("r3").value = r.passo || "";
+  $("copyBox").hidden = true;
+}
+
+function summary() {
+  const { keys, out, avg } = weekStats();
+  const end = addDays(weekStart, 6);
+  const r = S.reviews[iso(weekStart)] || {};
+  const L = [];
+  L.push(`*Diario della settimana${S.profile.name ? " di " + S.profile.name : ""}*`);
+  L.push(`Dal ${fmtShort(weekStart)} al ${fmtShort(end)}`);
+  if (S.profile.goal) L.push(`🎯 Obiettivo ${S.profile.goal}`);
+  L.push("");
+  out.forEach(s => L.push(`${s.h.ico} ${s.h.name} ${s.v} ${s.u}`));
+  if (avg) L.push(`🙂 Umore medio ${avg} su 5`);
+  const notes = keys.map((k, i) => (S.days[k] || {}).note ? `${GG[i]} ${S.days[k].note}` : null).filter(Boolean);
+  if (notes.length) { L.push(""); L.push("*Note dei giorni*"); notes.forEach(n => L.push(n)); }
+  if (r.bene) { L.push(""); L.push("*Cosa è andato bene*"); L.push(r.bene); }
+  if (r.difficile) { L.push(""); L.push("*Cosa è stato più difficile*"); L.push(r.difficile); }
+  if (r.passo) { L.push(""); L.push("*Il mio prossimo passo*"); L.push(r.passo); }
+  return L.join("\n");
+}
+
+function toast(t) { const el = document.createElement("div"); el.className = "toast"; el.textContent = t; document.body.appendChild(el); setTimeout(() => el.remove(), 2200); }
+
+function renderSettings() {
+  $("nameIn").value = S.profile.name; $("goalIn").value = S.profile.goal; $("litersIn").value = S.profile.liters;
+  const c = $("habitChips"); c.innerHTML = "";
+  HABITS.forEach(h => {
+    const b = document.createElement("button"); b.type = "button"; b.className = "chip";
+    b.textContent = `${h.ico} ${h.name}`; b.setAttribute("aria-pressed", S.profile.habits.includes(h.id));
+    b.onclick = () => { const hs = S.profile.habits; S.profile.habits = hs.includes(h.id) ? hs.filter(x => x !== h.id) : HABITS.map(x => x.id).filter(x => x === h.id || hs.includes(x)); save(); renderSettings(); renderAll(); };
+    c.appendChild(b);
+  });
+}
+function renderHello() { $("hello").textContent = S.profile.name ? `Ciao ${S.profile.name}, ecco il tuo diario` : "Il tuo diario di ogni giorno"; }
+function renderAll() { renderWeek(); renderDay(); renderReview(); renderHello(); }
+
+$("noteIn").addEventListener("input", e => { dayData(iso(sel)).note = e.target.value; save(); });
+[["r1","bene"],["r2","difficile"],["r3","passo"]].forEach(([id, f]) => $(id).addEventListener("input", e => { (S.reviews[iso(weekStart)] ||= {})[f] = e.target.value; save(); }));
+$("prevW").onclick = () => { weekStart = addDays(weekStart, -7); sel = addDays(weekStart, 6); renderAll(); };
+$("nextW").onclick = () => { weekStart = addDays(weekStart, 7); const thisW = iso(weekStart) === iso(mondayOf(today)); sel = thisW ? new Date(today.getFullYear(), today.getMonth(), today.getDate()) : weekStart; renderAll(); };
+$("openSettings").onclick = () => { renderSettings(); $("settings").hidden = !$("settings").hidden; if (!$("settings").hidden) $("settings").scrollIntoView({ behavior: "smooth" }); };
+$("closeSettings").onclick = () => { $("settings").hidden = true; renderAll(); };
+$("nameIn").addEventListener("input", e => { S.profile.name = e.target.value.trim(); save(); renderHello(); });
+$("goalIn").addEventListener("input", e => { S.profile.goal = e.target.value.trim(); save(); });
+$("litersIn").addEventListener("input", e => { const v = Math.max(1, Math.min(5, parseInt(e.target.value) || 2)); S.profile.liters = v; save(); renderAll(); });
+$("copyBtn").onclick = () => {
+  const t = summary();
+  const fallback = () => { const b = $("copyBox"); b.value = t; b.hidden = false; b.focus(); b.select(); toast("Tieni premuto sul testo e scegli Copia"); };
+  try { navigator.clipboard.writeText(t).then(() => toast("Riepilogo copiato, ora incollalo su WhatsApp ✓"), fallback); } catch (e) { fallback(); }
+};
+
+if (!S.profile.name && !memOnly) { renderSettings(); $("settings").hidden = false; }
+renderAll();
+</script>
+
+</body></html>
